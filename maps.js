@@ -1,57 +1,59 @@
+// create angular app
 var app = angular.module('myApp', []);
 
-app.service('Map', function ($q) {
-
-    this.init = function (input) {
-
-    }
-});
-
-app.controller('newPlaceCtrl', function ($scope, Map) {
-
+// maps controller
+app.controller('mapsCtrl', function ($scope) {
+    // input search model
     $scope.value = null;
-    //Map.init($scope.value);
 
+    // set initial position
     var myLatLng = { lat: -6.1958997, lng: 106.8161688 };
 
+    // create initial maps
     var map = new google.maps.Map(document.getElementById('map'), {
         center: myLatLng,
         zoom: 14,
         mapTypeId: 'roadmap',
     });
 
-    var markers = new google.maps.Marker({
+    // create initial marker    
+    var marker = new google.maps.Marker({
         map: map,
         position: myLatLng,
         draggable: true,
         title: 'Drag Me',
     });
 
-    google.maps.event.addListener(markers, 'dragend', function () {
+    // Create the search box and link it to the UI element.
+    var input = document.getElementById('input-address');
+    var searchBox = new google.maps.places.SearchBox(input);
+
+    // get marker position 
+    $scope.getPosition = function (marker) {
         geocoder = new google.maps.Geocoder();
         geocoder.geocode
             ({
-                latLng: markers.getPosition(),
+                latLng: marker.getPosition(),
             },
             function (results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
-                    value = results[0].formatted_address;
-                    console.log(results[0].formatted_address);
+                    $scope.$apply(function () {
+                        $scope.value = results[0].formatted_address;
+                    });
                 }
                 else {
                     console.log(status);
                 }
             }
             );
+    }
+
+    // marker drag event listener
+    google.maps.event.addListener(marker, 'dragend', function () {
+        $scope.getPosition(marker)
     });
 
-
-    // Create the search box and link it to the UI element.
-    var input = document.getElementById('input-address');
-    var searchBox = new google.maps.places.SearchBox(input);
     //map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-
     // Bias the SearchBox results towards current map's viewport.
     map.addListener('bounds_changed', function () {
         searchBox.setBounds(map.getBounds());
@@ -73,18 +75,18 @@ app.controller('newPlaceCtrl', function ($scope, Map) {
             return;
         }
 
-        // Clear out the old markers.
-        markers.setMap(null);
+        // remove old marker
+        marker.setMap(null);
 
-        // For each place, get the icon, name and location.
         var bounds = new google.maps.LatLngBounds();
         places.forEach(function (place) {
             if (!place.geometry) {
                 console.log("Returned place contains no geometry");
                 return;
             }
-            // Create a marker
-            markers = new google.maps.Marker({
+
+            // create new marker
+            marker = new google.maps.Marker({
                 map: map,
                 title: place.name,
                 position: place.geometry.location,
@@ -92,12 +94,16 @@ app.controller('newPlaceCtrl', function ($scope, Map) {
             });
 
             if (place.geometry.viewport) {
-                // Only geocodes have viewport.
                 bounds.union(place.geometry.viewport);
             } else {
                 bounds.extend(place.geometry.location);
             }
+
+            google.maps.event.addListener(marker, 'dragend', function () {
+                $scope.getPosition(marker);
+            });
         });
+
         map.fitBounds(bounds);
     });
 });
