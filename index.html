@@ -1,1 +1,33 @@
-hello world
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simple Map App</title>
+    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <h3 align="center">Simple Maps with Angular 1</h3>
+    <div class="container" ng-app="myApp" ng-controller="newPlaceCtrl">
+
+        <form name="searchForm" novalidate ng-submit="search()">
+            <div class="input-group">
+                <input name="address" id="input-address" size="2" type="text" class="form-control" ng-model="value" placeholder="Input Address" style="margin: 10px;"/>
+            </div>
+        </form>
+
+        <div id="map"></div>
+
+    </div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCo1U7yjCkkuKuw4kchtXO9vMOb_T04XFA&libraries=places" async
+        defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="./maps.js"></script>
+</body>
+
+</html>
